@@ -81,6 +81,7 @@ def main():
     p.add_argument('--disc-key', type=Path)
     p.add_argument('--common-key', type=Path)
     p.add_argument('--output', type=Path, default=ROOT.parent/'Wind-Waker-HD-PS5-install/PPSA99641')
+    p.add_argument('--game-package', action='store_true', help='Prepare game/ for the matching separately installed catalog app')
     p.add_argument('--jobs', type=int, default=4)
     a = p.parse_args()
     if not a.game and not a.image:
@@ -132,7 +133,7 @@ def main():
              '-fno-stack-protector','-fno-plt','-femulated-tls','-fdenormal-fp-math=ieee',
              '-fPIC','-O3','-DNDEBUG','-std=gnu11','-ffp-contract=off','-fno-strict-aliasing','-w']
     sources = sorted(gen.glob('code_*.c'))+[gen/'table.c',gen/'imports.c']
-    build_identity = sha(runtime/'manifest.json') + sha(ROOT/'runtime/include/ppc.h') + sha(ROOT/'ps5/toolchains.json')
+    build_identity = sha(runtime/'manifest.json') + sha(ROOT/'runtime/include/ppc.h') + sha(ROOT/'runtime/include/recomp_table.h') + sha(ROOT/'ps5/toolchains.json')
     def compile_one(source):
         obj=objects/(source.stem+'.o')
         stamp=obj.with_suffix('.sha256')
@@ -147,6 +148,12 @@ def main():
     archive=work/'libgamecode.a'
     archive.unlink(missing_ok=True)
     run(tools['llvm-ar'],'rcs',archive,*compiled)
+    if a.game_package:
+        module=work/'game.wwhd'
+        run(python,ROOT/'ps5/tools/build-game-module.py','--archive',archive,'--clang',tools['clang'],'--linker',tools['ld.lld'],'--nm',tools['llvm-nm'],'--output',module)
+        run(python,ROOT/'ps5/tools/package-game.py','--game',game,'--module',module,'--output',a.output)
+        print('Copy the generated game/ and user/ folders into the matching installed PPSA99641 app.')
+        return
     elf=work/'llvm-pie.elf'
     recipe=json.loads((runtime/'link.json').read_text())
     args=[x.replace('{RUNTIME}',str(runtime)).replace('{GAME_ARCHIVE}',str(archive)).replace('{ELF}',str(elf)) for x in recipe]

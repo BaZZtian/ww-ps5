@@ -24,6 +24,24 @@ namespace gfxvk { void set_res_scale(float); }
 int wwhd_main(int argc, char** argv);
 int main() {
     platform_init("Wind Waker HD");
+    // Opt-in timings for console diagnostics; no on-screen performance overlay.
+    if (FILE* flag = fopen("/app0/ps5-perf.txt", "rb")) {
+        const bool detailed = fgetc(flag) == '2';
+        fclose(flag);
+        setenv(detailed ? "WWHD_VK_STATS" : "WWHD_VK_CPU_ONLY_STATS", "1", 1);
+        say("Rendering timing diagnostics enabled (%s)", detailed ? "detailed" : "lightweight");
+    }
+    // The PS5 render thread can exceed its frame budget on busy views. Use the
+    // renderer's exact-match reuse paths; mutable guest data is still checked
+    // before reuse, and submission/save-state invalidation remains in place.
+    for (const char* name : {
+             "WWHD_VK_REUSE_UNIFORM_SNAPSHOTS", "WWHD_VK_DESCRIPTOR_RANKS",
+             "WWHD_VK_PIPELINE_LOOKASIDE", "WWHD_VK_SHADER_ADDRESS_MEMO",
+             "WWHD_VK_FETCH_MEMO", "WWHD_VK_SPECIALIZE_INDICES",
+             "WWHD_VK_SHADER_STATE_MEMO", "WWHD_VK_SAMPLER_MEMO",
+             "WWHD_VK_SHADER_KEY_DIRTY", "WWHD_VK_REUSE_VERTEX_SNAPSHOTS",
+             "WWHD_VK_SKIP_VERTEX_BINDS", "WWHD_VK_VERTEX_HISTORY_REUSE"})
+        setenv(name, "1", 0);
     mkdir("/download0/user", 0777);
     mkdir("/download0/user/save", 0777);
     mkdir("/download0/user/captures", 0777);

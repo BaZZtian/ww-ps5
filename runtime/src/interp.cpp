@@ -531,7 +531,12 @@ constexpr auto kPacedStep = std::chrono::nanoseconds(33'333'333);
 // another logic pass directly
 static void paced_pass_start() {
     static bool previousHold = false;
-    if (!paced() || !interp_on()) { g_exact_step = false; previousHold = false; return; }
+    if (!paced() || !enabled()) {
+        g_exact_step = false; previousHold = false;
+        g_last_entry = {}; g_slept = {}; g_wait_step = false;
+        g_pass_avg = std::chrono::milliseconds(16);
+        return;
+    }
     if (!g_hold_next) g_exact_step = !previousHold;  // this logic pass: blend only after a hold
     previousHold = g_hold_next;
     const auto now = pace_clock::now();
@@ -549,7 +554,7 @@ static void paced_pass_start() {
 }
 // end of a logic pass: an in-between pass follows only if it fits before the next step is due
 static void paced_after_logic() {
-    if (!paced() || !interp_on()) { g_hold_next = true; g_wait_step = false; return; }
+    if (!paced() || !enabled()) { g_hold_next = true; g_wait_step = false; return; }
     const auto elapsed = pace_clock::now() - g_last_logic;
     const bool fits = elapsed + g_pass_avg <= kPacedStep + std::chrono::milliseconds(2);
     g_hold_next = fits;

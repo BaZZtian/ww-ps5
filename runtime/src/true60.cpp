@@ -716,8 +716,10 @@ extern "C" void hook_025DF940(Cpu* c) {
             g_cam_half_proc = proc;
             cam_preview = true;
             region_begin(g_cam_play, kPlayCamLo, kPlayCamHi - kPlayCamLo);
-        } else if (g_cam_restored == g_pass) {
-            dt = 1.0f;  // pass_begin put the camera back: a whole step
+        } else {
+            // A full pass is a whole step even if pacing skipped the preceding
+            // preview. Scaling it by 0.5 in that case slows the camera down.
+            dt = 1.0f;
             link_conv = true;  // (drawn as a 60 Hz process: not blended)
         }
     }

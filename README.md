@@ -2,7 +2,7 @@
 
 A native PS5 port of [ZeldaWWHDRecomp v0.2.3](https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp), using the PS5 Vulkan runtime. Companion project to [Ocarina of Time](https://github.com/mshivam019/oot64-ps5), [Majora’s Mask](https://github.com/mshivam019/tmm64-ps5) and [Dusklight](https://github.com/mshivam019/dusklight-ps5) for PS5.
 
-[Download v0.1.1](https://github.com/mshivam019/ww-ps5/releases/tag/ps5-v0.1.1) · [Installation and mods](ps5/README.md) · [Build from source](ps5/README.md#windows-macos-and-linux)
+[Download v0.1.2](https://github.com/mshivam019/ww-ps5/releases/tag/ps5-v0.1.2) · [Installation and mods](ps5/README.md) · [Build from source](ps5/README.md#windows-macos-and-linux)
 
 **Stable release.** Tested on PS5 firmware 9.00 with kstuff and ShadowMount.
 
@@ -22,16 +22,19 @@ A native PS5 port of [ZeldaWWHDRecomp v0.2.3](https://github.com/ZeldaWWHDRecomp
 - Your own **USA Wii U version 0** dump, or its extracted `code`, `content` and `meta` folders.
 - A Windows, macOS or Linux computer with Python 3.11+ for setup and enough M.2 space for the game and save states.
 
-The setup ZIP includes our prebuilt runtime and libraries. Setup generates the native PS5 executable (`eboot.bin`) from your dump and assembles the installable `PPSA99641` folder. The ZIP itself is a desktop setup bundle, not a directly installable PS5 app. Game files, keys, saves and the generated game executable are not included.
+The release contains a ready-to-install PS5 app and a separate computer setup bundle.
+Your game dump, keys and generated game module stay on your computer and console.
 
 ## Installation
 
-1. Download and extract the [setup ZIP](https://github.com/mshivam019/ww-ps5/releases/tag/ps5-v0.1.1).
-2. Run **Setup-Windows.cmd** on Windows, **Setup-macOS.command** on macOS, or `sh setup.sh` on Linux. Choose your dump and wait for the finished `PPSA99641` folder. [First-time prerequisites](ps5/README.md#windows-macos-and-linux).
-3. Close the game, then upload the generated folder to `/mnt/ext1/etaHEN/games/PPSA99641` using FTP or the included [installer](ps5/tools/install.py).
-4. Register/mount the folder with your native-title launcher or PS5 Upload, then launch **Wind Waker HD** from the home screen.
+1. Install **PPSA99641.zip** using your native-title launcher or PS5 Upload.
+2. Extract the matching **setup ZIP** on your computer. Run **Setup-Windows.cmd**, **Setup-macOS.command**, or `sh setup.sh` on Linux.
+3. Choose your dump. Setup prepares `game/` and the default PlayStation button mod.
+4. With the game closed, copy the generated `game/` and `user/` folders into `/mnt/ext1/etaHEN/games/PPSA99641`. Preserve existing saves and settings.
+5. Launch **Wind Waker HD** from the PS5 home screen.
 
-Preserve the title’s save sandbox and `user/` folder when updating. FTP upload alone does not register the title.
+Existing v0.1.1 users need to run setup once to create `game/game.wwhd`.
+[Setup details](ps5/CATALOG-SETUP.md). GameCube GCM/ISO/RVZ files cannot be used with this Wii U HD port.
 
 ## Controls and settings menu
 
@@ -64,6 +67,8 @@ This changes the emulated Wii U language, not your PS5 system language. The sett
 ## Build and validate
 
 See [build instructions](ps5/README.md#windows-macos-and-linux), [dependency pins](ps5/dependencies.json) and [release validation](ps5/RELEASING.md). The build creates a private installation from your dump; keep that generated package local.
+
+The default is paced 60 FPS interpolation. Frame rate varies by scene; True 60 remains an optional setting.
 
 ## Credits and license
 

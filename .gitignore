@@ -52,3 +52,8 @@ headstart.bin
 
 /runtime-prebuilt
 /host-tools
+
+# User-generated loadable game modules and GameCube images
+*.wwhd
+*.gcm
+*.gcz

@@ -9,7 +9,7 @@ import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-FORBIDDEN = {'.a','.o','.so','.exe','.dll','.dylib','.pdb','.rpx','.wux','.wud','.iso','.rvz','.key','.elf','.bin','.prx','.sav','.png','.jpg','.mp4','.zip'}
+FORBIDDEN = {'.a','.o','.so','.exe','.dll','.dylib','.pdb','.wwhd','.gcm','.gcz','.rpx','.wux','.wud','.iso','.rvz','.key','.elf','.bin','.prx','.sav','.png','.jpg','.mp4','.zip'}
 
 def validate_archive(path):
     with zipfile.ZipFile(path) as z:
@@ -23,7 +23,8 @@ def validate_archive(path):
             if p.is_absolute() or '..' in p.parts or '\\' in name: raise ValueError(f'Unsafe path: {name}')
             runtime_file = prebuilt and p.parts[0] == 'runtime-prebuilt' and p.suffix.lower() in {'.a','.o','.so','.prx','.h','.hpp','.inc','.def','.tcc','.txt','.json','.ld','.map',''}
             host_file = prebuilt and len(p.parts) == 3 and p.parts[0] == 'host-tools' and p.name in {'ps5-native-tool','ps5-native-tool.exe'}
-            if p.name in {'libgamecode.a','eboot.bin','eboot.elf'} or (p.suffix.lower() in FORBIDDEN and not (runtime_file or host_file)) or any(x in p.parts for x in ('.git','.deps','build','private-assets','backups')):
+            artwork = name == "ps5/art/catalog-icon.png" and z.read(name).startswith(b"\x89PNG\r\n\x1a\n")
+            if p.name in {'libgamecode.a','eboot.bin','eboot.elf'} or (p.suffix.lower() in FORBIDDEN and not (runtime_file or host_file or artwork)) or any(x in p.parts for x in ('.git','.deps','build','private-assets','backups')):
                 raise ValueError(f'Private/binary artifact in source release: {name}')
             if (z.getinfo(name).external_attr >> 16) & 0o170000 == 0o120000: raise ValueError(f'Symlink: {name}')
         manifest = json.loads(z.read('RELEASE-MANIFEST.json'))

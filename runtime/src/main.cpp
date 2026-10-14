@@ -1,3 +1,7 @@
+#ifdef WWHD_GAME_MODULE
+#include "bind.h"
+namespace gfxvk { int game_setup_screen(const std::string&); }
+#endif
 #ifdef __PROSPERO__
 #define main wwhd_main
 #endif
@@ -321,6 +325,14 @@ int main(int argc, char** argv) {
         });
         return result;
     }
+#endif
+#ifdef WWHD_GAME_MODULE
+    std::string module_error;
+    if (!wwhd_load_game_module((config::game_dir + "/game.wwhd").c_str(), module_error)) {
+        LOG("[game module] %s", module_error.c_str());
+        return gfxvk::game_setup_screen(module_error);
+    }
+    LOG("[game module] loaded %u functions, %u imports", g_recomp_func_count, g_recomp_import_count);
 #endif
     mods::manager::load_saved();  // player choices, before the game starts
     mods::cemu::set_vulkan(render::requested()==render::Api::Vulkan);

@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Stop'
 $script = Join-Path $PSScriptRoot 'ps5/tools/setup.py'
 if (Get-Command py -ErrorAction SilentlyContinue) {
-    & py -3 $script @args
+    & py -3 $script --game-package @args
 } elseif (Get-Command python -ErrorAction SilentlyContinue) {
-    & python $script @args
+    & python $script --game-package @args
 } else {
     throw 'Install Python 3.11 or newer, then run this script again.'
 }

@@ -49,6 +49,10 @@ float paced_drawn_share();  // share of in-between frames drawn lately (paced an
 namespace gx2 { uint64_t flips_presented(); }
 
 namespace overlay {
+#ifdef WWHD_GAME_MODULE
+static std::string setup_message;
+void set_setup_message(const std::string& message) { setup_message = message; }
+#endif
 namespace {
 
 using clock = std::chrono::steady_clock;
@@ -549,7 +553,7 @@ void tab_graphics() {
     ImGui::SameLine();
     if (radio("True 60 (experimental)", m == 2)) post_changed([] { interp::set_mode(2); });
     help("True 60 runs the game logic at 60 steps per second");
-    if (m == 1) {
+    if (m != 0) {
         bool paced;
         if (check("Keep game speed", interp::paced_interpolation(), &paced, !getenv("WWHD_INTERP_PACED")))
             post_changed([paced] { interp::set_paced_interpolation(paced); });
@@ -1432,7 +1436,11 @@ ImDrawData* frame(float pw, float ph, void (*renderer_init)()) {
     // the game's text prompt shows unless the menu is open over it (the menu has the input then)
     const bool open = is_open(), perf = perf_shown(), text = !open && text_entry::active();
     U.linearized = false;
-    if (!open && !perf && !text) {
+    bool setup = false;
+#ifdef WWHD_GAME_MODULE
+    setup = !setup_message.empty();
+#endif
+    if (!open && !perf && !text && !setup) {
         if (U.init) {  // forget events and pressed keys while nothing is shown
             std::lock_guard<std::mutex> lk(g_mu);
             g_events.clear();
@@ -1474,6 +1482,19 @@ ImDrawData* frame(float pw, float ph, void (*renderer_init)()) {
     apply_capture();
     feed_gamepad(io, open && U.cap_action < 0);  // the text prompt reads the controller itself
     ImGui::NewFrame();
+#ifdef WWHD_GAME_MODULE
+    if (setup) {
+        ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.1f, io.DisplaySize.y * 0.2f));
+        ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x * 0.8f, io.DisplaySize.y * 0.6f));
+        ImGui::Begin("Wind Waker HD - Game setup", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+        ImGui::TextWrapped("%s", setup_message.c_str());
+        ImGui::Spacing();
+        ImGui::TextWrapped("Run the matching setup on your computer using your own USA Wii U version 0 dump. Copy its game folder into PPSA99641, then relaunch.");
+        ImGui::Spacing();
+        ImGui::TextWrapped("Press Cross to return to the PS5 home screen.");
+        ImGui::End();
+    } else
+#endif
     if (open) settings_window();
     if (text) {
         float pad[input_map::kPadCount];

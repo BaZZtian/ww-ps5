@@ -1,5 +1,8 @@
 # Prebuilt runtime and tools
 
+The separate catalog app includes the native runtime executable but no generated
+game code. The player prepares the game module locally.
+
 The setup ZIP includes reusable libraries compiled from the pinned public
 sources in `dependencies.json`, plus native packaging tools. It excludes
 `libgamecode.a` and final game executables. Users generate those from their dump.

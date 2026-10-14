@@ -1,6 +1,7 @@
 # Setup and installation
 
-The release builds **PPSA99641** from your own **USA Wii U version 0** dump.
+Install the release's **PPSA99641.zip** app first. The computer setup prepares its
+separate game folder from your own **USA Wii U version 0** dump.
 Use an extracted folder containing `code`, `content` and `meta`, or a WUX image
 with your own disc key and Wii U common key files. Other regions and revisions
 are rejected before compilation.
@@ -12,12 +13,12 @@ WSL, SDK installation or manual compiler setup is needed.
 
 1. **Windows:** double-click `Setup-Windows.cmd`. **macOS:** open `Setup-macOS.command` (or run `sh setup.sh`). **Linux:** run `sh setup.sh`.
 2. Enter your WUX file or extracted game folder path and press Enter.
-3. Wait for “Ready”. Your finished `Wind-Waker-HD-PS5-install/PPSA99641` folder is beside the setup folder.
+3. Wait for “Ready”. Your game package is in `Wind-Waker-HD-PS5-install/PPSA99641` beside the setup folder.
 
 For WUX, setup looks for a same-named `.key` and `common.key` beside the image.
 If missing, it asks for their paths. Keys stay on your computer.
 
-Our runtime, graphics libraries and packaging tools are already built. Setup
+The PS5 app is already built. Setup
 automatically downloads a verified portable compiler, compiles only the code
 from your dump, adds PlayStation prompts and checks the finished files. Windows,
 macOS and Linux releases support x86-64 and ARM64 computers. Internet access and
@@ -46,7 +47,7 @@ sh setup.sh --image "/path/to/game.wux" --disc-key "/path/to/game.key" --common-
 The same arguments work with `setup.ps1`. Keys stay in local files. The scripts
 extract the game, use our prebuilt libraries, compile the game code, add the PlayStation prompts
 and validate every packaged file. The output must be a new folder named
-`PPSA99641`. Game files and generated executables stay on your computer.
+`PPSA99641`. Game files and the generated `game/game.wwhd` module stay private.
 
 Use `--jobs 2` to reduce compilation memory use. Compiler downloads are cached
 for future attempts. The game and installation still run on PS5; these scripts
@@ -55,8 +56,9 @@ run on your computer only to prepare its files.
 ## Install on PS5
 
 1. Close Wind Waker HD if it is running.
-2. Upload the generated `PPSA99641` folder to `/mnt/ext1/etaHEN/games/PPSA99641`.
-   Use FTP, or the included installer with FTP and PS5 Upload running:
+2. Install the app ZIP at `/mnt/ext1/etaHEN/games/PPSA99641`, then copy the generated
+   `game/` and `user/` folders into it using FTP. Preserve existing saves and settings.
+   The included installer accepts the extracted app folder with FTP and PS5 Upload running:
 
    ```sh
    python3 ps5/tools/install.py --src /path/to/install/PPSA99641 --console YOUR_PS5_IP
@@ -105,4 +107,4 @@ For standalone WUX extraction, use `ps5/tools/prepare-game.py` with
 ## Release checks
 
 [RELEASING.md](RELEASING.md) documents packaging and validation. Releases contain
-source and setup tools, without game data, keys or game-derived executables.
+the ready-to-install app, source and setup tools, without game data, keys or game-derived modules.
