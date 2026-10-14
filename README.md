@@ -22,7 +22,7 @@ A native PS5 port of [ZeldaWWHDRecomp v0.2.3](https://github.com/ZeldaWWHDRecomp
 - Your own **USA Wii U version 0** dump, or its extracted `code`, `content` and `meta` folders.
 - A Windows, macOS or Linux computer with Python 3.11+ for setup and enough M.2 space for the game and save states.
 
-The setup ZIP includes our prebuilt runtime and libraries. Game files, keys, saves and the generated game executable are not included.
+The setup ZIP includes our prebuilt runtime and libraries. Setup generates the native PS5 executable (`eboot.bin`) from your dump and assembles the installable `PPSA99641` folder. The ZIP itself is a desktop setup bundle, not a directly installable PS5 app. Game files, keys, saves and the generated game executable are not included.
 
 ## Installation
 
