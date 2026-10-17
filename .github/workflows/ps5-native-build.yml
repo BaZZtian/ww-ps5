@@ -1,0 +1,83 @@
+name: PS5 ROM-free application build
+
+on:
+  push:
+    branches:
+      - ps5/interpolation-late-frame-backoff
+    paths:
+      - .github/workflows/ps5-native-build.yml
+  workflow_dispatch:
+
+jobs:
+  cross-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Check out the port
+        uses: actions/checkout@v4
+
+      - name: Install required host tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential clang lld llvm llvm-dev libclang-dev libclc-dev \
+            cmake ninja-build git make curl wget unzip rsync flex bison \
+            pkg-config python3 python3-venv python3-dev libffi-dev \
+            libelf-dev spirv-tools libzstd-dev
+          python3 -m venv "$RUNNER_TEMP/wwhd-build-env"
+          "$RUNNER_TEMP/wwhd-build-env/bin/pip" install 'meson>=1.7' mako pyyaml packaging
+          echo "$RUNNER_TEMP/wwhd-build-env/bin" >> "$GITHUB_PATH"
+
+      - name: Prepare pinned open-source PS5 SDK and RADV
+        run: python3 ps5/tools/setup-deps.py --build-radv
+
+      - name: Compile PS5 SDL3 static library
+        run: |
+          cmake -S .deps/src/SDL -B build/sdl3-ps5 -G Ninja \
+            -DCMAKE_TOOLCHAIN_FILE="$PWD/.deps/native/ps5-payload-sdk/toolchain/prospero.cmake" \
+            -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSDL_SHARED=OFF -DSDL_STATIC=ON -DSDL_TEST_LIBRARY=OFF -DSDL_TESTS=OFF \
+            -DSDL_UNIX_CONSOLE_BUILD=ON -DSDL_X11=OFF -DSDL_WAYLAND=OFF \
+            -DSDL_KMSDRM=OFF -DSDL_AUDIO=ON -DSDL_JOYSTICK=ON \
+            -DSDL_JOYSTICK_VIRTUAL=ON -DSDL_HAPTIC=ON -DSDL_SENSOR=ON \
+            -DSDL_HIDAPI=OFF -DSDL_DUMMYAUDIO=OFF -DSDL_DISKAUDIO=OFF \
+            -DSDL_CAMERA=OFF -DSDL_DIALOG=OFF -DSDL_TRAY=OFF \
+            -DSDL_VULKAN=OFF -DSDL_OPENGL=OFF -DSDL_OPENGLES=OFF \
+            -DLIBC_HAS_WCSNLEN=OFF -DLIBC_HAS_WCSLCPY=OFF -DLIBC_HAS_WCSLCAT=OFF
+          cmake --build build/sdl3-ps5 --target SDL3-static --parallel 3
+
+      - name: Cross-compile game-independent PS5 application
+        run: |
+          python3 ps5/tools/build-catalog.py \
+            --sdk .deps/native/ps5-payload-sdk \
+            --vulkan .deps/src/vulkan \
+            --sdl-build build/sdl3-ps5 \
+            --sdl-source .deps/src/SDL --jobs 3
+
+      - name: Package untested PS5 title and validate archive
+        run: |
+          python3 ps5/tools/package-catalog.py \
+            --executable build/catalog-app/eboot.bin \
+            --libc .deps/src/vulkan/runtime/libc.prx \
+            --output build/catalog-ci
+          test -s build/catalog-ci/PPSA99641.zip
+          sha256sum build/catalog-ci/PPSA99641.zip
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('build/catalog-ci/PPSA99641/manifest.json')
+          data=json.loads(p.read_text())
+          assert data['game_independent'] is True
+          assert data['console_tested'] is False
+          print('ROM-free archive verified; on-console gameplay remains untested.')
+          PY
+
+      - name: Upload ROM-free, untested PS5 build
+        uses: actions/upload-artifact@v4
+        with:
+          name: wind-waker-hd-ps5-ci-untested
+          path: |
+            build/catalog-ci/PPSA99641.zip
+            build/catalog-ci/PPSA99641.zip.sha256
+          retention-days: 7
