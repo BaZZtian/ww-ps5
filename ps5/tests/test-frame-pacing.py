@@ -12,6 +12,8 @@ functions = source[start:end].replace(
     'using pace_clock = std::chrono::steady_clock;', 'using pace_clock = TestClock;')
 preamble = r'''
 #include <atomic>
+#include "ps5_pacing_backoff.h"
+using interp::Ps5PacingBackoff;
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -77,7 +79,9 @@ with tempfile.TemporaryDirectory(prefix='wwhd-pacing-') as work:
     work = Path(work)
     cpp = work / 'pacing.cpp'
     cpp.write_text(preamble + functions + tests)
-    exe = work / 'pacing'
-    subprocess.run(['c++', '-std=c++20', '-O1', '-g', '-fsanitize=address,undefined',
-                    str(cpp), '-o', str(exe)], check=True)
-    subprocess.run([str(exe)], check=True)
+    for mode, flags in [('host', []), ('ps5-policy', ['-D__PROSPERO__'])]:
+        exe = work / ('pacing-' + mode)
+        subprocess.run(['c++', '-std=c++20', '-O1', '-g', '-fsanitize=address,undefined',
+                        '-I' + str(root / 'runtime/src'), *flags,
+                        str(cpp), '-o', str(exe)], check=True)
+        subprocess.run([str(exe)], check=True)
