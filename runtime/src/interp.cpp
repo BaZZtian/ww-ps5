@@ -547,6 +547,7 @@ static void paced_pass_start() {
         return;
     }
     if (!g_hold_next) g_exact_step = !previousHold;  // this logic pass: blend only after a hold
+    const bool wasHold = previousHold;
     previousHold = g_hold_next;
     const auto now = pace_clock::now();
     if (g_last_entry != pace_clock::time_point{})
@@ -556,7 +557,7 @@ static void paced_pass_start() {
 #ifdef __PROSPERO__
     // On the next logic pass, check whether the previous in-between pass
     // delayed the 30 Hz step. Do not infer lateness from CPU render costs.
-    if (!g_hold_next && previousHold && g_last_logic != pace_clock::time_point{})
+    if (!g_hold_next && wasHold && g_last_logic != pace_clock::time_point{})
         g_ps5_backoff.observe_hold(now.time_since_epoch(),
             now - g_last_logic > kPacedStep + std::chrono::milliseconds(2));
 #endif
