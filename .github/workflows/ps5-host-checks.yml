@@ -1,0 +1,31 @@
+name: PS5 port host checks
+
+on:
+  push:
+    branches:
+      - ps5/interpolation-late-frame-backoff
+  pull_request:
+
+jobs:
+  host-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install host build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang lld g++
+      - name: Compile and run PS5 pacing policy tests
+        run: |
+          g++ -std=c++20 -Wall -Wextra -Werror -O1 -g \
+            -fsanitize=address,undefined -Iruntime/src \
+            ps5/tests/test-ps5-pacing-backoff.cpp -o /tmp/ps5-pacing-test
+          /tmp/ps5-pacing-test
+      - name: Run existing deterministic frame-pacing tests
+        run: python3 ps5/tests/test-frame-pacing.py
+      - name: Test native module loader
+        run: python3 ps5/tests/test-module-loader.py
+      - name: Run release validation tests
+        run: python3 -m unittest discover -s ps5/tests -p 'test_release.py' -v
+      - name: Check Python build-tool syntax
+        run: python3 -m compileall -q ps5/tools
