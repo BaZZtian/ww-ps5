@@ -547,7 +547,9 @@ static void paced_pass_start() {
         return;
     }
     if (!g_hold_next) g_exact_step = !previousHold;  // this logic pass: blend only after a hold
+#ifdef __PROSPERO__
     const bool wasHold = previousHold;
+#endif
     previousHold = g_hold_next;
     const auto now = pace_clock::now();
     if (g_last_entry != pace_clock::time_point{})
