@@ -25,6 +25,9 @@
 #include "runtime.h"
 #include "savestate.h"
 #include "true60.h"
+#ifdef __PROSPERO__
+#include "ps5_pacing_backoff.h"
+#endif
 
 
 extern "C" {
@@ -526,6 +529,9 @@ static pace_clock::time_point g_last_logic{}, g_last_entry{};
 static pace_clock::duration g_slept{}, g_pass_avg = std::chrono::milliseconds(16);
 static bool g_wait_step = false;  // no in-between pass: the next logic pass waits for its time
 static uint64_t g_paced_dropped = 0, g_paced_holds = 0;
+#ifdef __PROSPERO__
+static Ps5PacingBackoff g_ps5_backoff;
+#endif
 constexpr auto kPacedStep = std::chrono::nanoseconds(33'333'333);
 // start of every pass: the last pass's own duration, and the wait before a logic pass that follows
 // another logic pass directly
@@ -535,6 +541,9 @@ static void paced_pass_start() {
         g_exact_step = false; previousHold = false;
         g_last_entry = {}; g_slept = {}; g_wait_step = false;
         g_pass_avg = std::chrono::milliseconds(16);
+#ifdef __PROSPERO__
+        g_ps5_backoff.reset();
+#endif
         return;
     }
     if (!g_hold_next) g_exact_step = !previousHold;  // this logic pass: blend only after a hold
@@ -544,6 +553,13 @@ static void paced_pass_start() {
         g_pass_avg = (g_pass_avg * 3 + (now - g_last_entry - g_slept)) / 4;
     g_last_entry = now;
     g_slept = {};
+#ifdef __PROSPERO__
+    // On the next logic pass, check whether the previous in-between pass
+    // delayed the 30 Hz step. Do not infer lateness from CPU render costs.
+    if (!g_hold_next && previousHold && g_last_logic != pace_clock::time_point{})
+        g_ps5_backoff.observe_hold(now.time_since_epoch(),
+            now - g_last_logic > kPacedStep + std::chrono::milliseconds(2));
+#endif
     if (g_hold_next) return;
     if (g_wait_step && now < g_last_logic + kPacedStep) {
         threads::park_sleep_until(g_last_logic + kPacedStep);  // the game keeps 30 steps a second
@@ -556,7 +572,11 @@ static void paced_pass_start() {
 static void paced_after_logic() {
     if (!paced() || !enabled()) { g_hold_next = true; g_wait_step = false; return; }
     const auto elapsed = pace_clock::now() - g_last_logic;
-    const bool fits = elapsed + g_pass_avg <= kPacedStep + std::chrono::milliseconds(2);
+    bool fits = elapsed + g_pass_avg <= kPacedStep + std::chrono::milliseconds(2);
+#ifdef __PROSPERO__
+    fits = g_ps5_backoff.allow_hold(pace_clock::now().time_since_epoch(), elapsed,
+                                    kPacedStep, fits);
+#endif
     g_hold_next = fits;
     g_wait_step = !fits;
     (fits ? g_paced_holds : g_paced_dropped)++;
