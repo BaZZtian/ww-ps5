@@ -23,7 +23,7 @@ jobs:
             build-essential clang lld llvm llvm-dev libclang-dev libclc-18-dev libllvmspirvlib-18-dev \
             cmake ninja-build git make curl wget unzip rsync flex bison \
             pkg-config python3 python3-venv python3-dev libffi-dev \
-            libelf-dev spirv-tools libzstd-dev
+            libelf-dev spirv-tools spirv-headers glslang-tools libzstd-dev
           python3 -m venv "$RUNNER_TEMP/wwhd-build-env"
           "$RUNNER_TEMP/wwhd-build-env/bin/pip" install 'meson>=1.7' mako pyyaml packaging
           echo "$RUNNER_TEMP/wwhd-build-env/bin" >> "$GITHUB_PATH"
