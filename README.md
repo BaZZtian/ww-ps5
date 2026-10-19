@@ -1,5 +1,9 @@
 # Wind Waker HD for PS5
 
+**[Start here: installation, USB/offline copying, Wi-Fi FTP and game-file locations](INSTALL.md).**
+M.2, Ethernet and PS5 Upload are optional. The guide also explains recovery after
+store updates; older packaged instructions may describe the developer's M.2 setup.
+
 A native PS5 port of [ZeldaWWHDRecomp v0.2.3](https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp), using the PS5 Vulkan runtime. Companion project to [Ocarina of Time](https://github.com/mshivam019/oot64-ps5), [Majora’s Mask](https://github.com/mshivam019/tmm64-ps5) and [Dusklight](https://github.com/mshivam019/dusklight-ps5) for PS5.
 
 [Download v0.1.2](https://github.com/mshivam019/ww-ps5/releases/tag/ps5-v0.1.2) · [Installation and mods](ps5/README.md) · [Build from source](ps5/README.md#windows-macos-and-linux)
@@ -13,28 +17,35 @@ A native PS5 port of [ZeldaWWHDRecomp v0.2.3](https://github.com/ZeldaWWHDRecomp
 - PS5 controller input, audio, and an on-screen keyboard for name entry.
 - Controller-operated settings, graphics options and mod menu.
 - PlayStation button textures enabled by default during setup.
-- Normal saves across restarts and save states stored on M.2.
+- Normal saves across restarts and save states alongside the title.
 - Show or hide the Wii U GamePad screen with a controller shortcut.
 
 ## Requirements
 
-- A homebrew-capable PS5 with native folder-title support, FTP and a title registration/mounting setup.
+- A homebrew-capable PS5 with native folder-title support, a file-copy method and a title registration/mounting setup.
 - Your own **USA Wii U version 0** dump, or its extracted `code`, `content` and `meta` folders.
-- A Windows, macOS or Linux computer with Python 3.11+ for setup and enough M.2 space for the game and save states.
+- A Windows, macOS or Linux computer with Python 3.11+ for setup and enough space at the selected installation location for the game and save states.
 
 The release contains a ready-to-install PS5 app and a separate computer setup bundle.
 Your game dump, keys and generated game module stay on your computer and console.
 
 ## Installation
 
-1. Install **PPSA99641.zip** using your native-title launcher or PS5 Upload.
-2. Extract the matching **setup ZIP** on your computer. Run **Setup-Windows.cmd**, **Setup-macOS.command**, or `sh setup.sh` on Linux.
-3. Choose your dump. Setup prepares `game/` and the default PlayStation button mod.
-4. With the game closed, copy the generated `game/` and `user/` folders into `/mnt/ext1/etaHEN/games/PPSA99641`. Preserve existing saves and settings.
-5. Launch **Wind Waker HD** from the PS5 home screen.
+1. Install `PPSA99641.zip` from ProsperoStore/the release, or unpack the
+   precompiled app for manual installation.
+2. Run the matching computer setup bundle on your own USA Wii U version 0 dump.
+   Keep the resulting `game/` folder (including `game.wwhd`, `code/`, `content/` and
+   `meta/`). GameCube images do not work with this HD port.
+3. With the game closed, copy **game/** into the installed `PPSA99641` folder.
+   Use USB/file-manager copying, Wi-Fi FTP, Ethernet FTP or any preferred method.
+   The destination is your loader/store's installed folder, not a fixed M.2 path.
+4. Preserve saves/settings. A new manual app requires mounting/registration with
+   your existing native-title loader; then start its home-screen tile.
 
-Existing v0.1.1 users need to run setup once to create `game/game.wwhd`.
-[Setup details](ps5/CATALOG-SETUP.md). GameCube GCM/ISO/RVZ files cannot be used with this Wii U HD port.
+[INSTALL.md](INSTALL.md) explains storage, offline transfer, the separate prepare
+and transfer helpers, and game-file recovery after store updates. The original
+game-module converter and file-transfer step are independent; preparing files
+never requires a console connection.
 
 ## Controls and settings menu
 
