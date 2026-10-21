@@ -69,3 +69,9 @@ pull request, build, release, and Store/catalog submission.**
   established: **do not publish, package, merge, or submit a release**.
 - Do not bypass these rules to meet a deadline. This document is operational
   guidance only: it does not itself license, transfer, or revoke any copyright.
+
+## 4. Project-specific known rights (not a complete legal audit)
+
+- Fork based on `mshivam019/ww-ps5`. The `ZeldaWWHDRecomp/ZeldaWWHDRecomp` engine is MPL-2.0; PS5 runtime and tools carry additional GPL and other component-level terms.
+- MPL-covered changes and GPL-relevant distributed binaries carry their source/notice duties. Only truly separate authored contributions may receive different compatible terms.
+- Game data and Nintendo rights are not licensed by this fork.
