@@ -28,6 +28,7 @@ def main():
     shutil.copy2(ROOT/'ps5/THIRD_PARTY_NOTICES.md',title/'THIRD_PARTY_NOTICES.md')
     shutil.copytree(ROOT/'ps5/licenses',title/'licenses')
     shutil.copy2(ROOT/'ps5/CATALOG-SETUP.md',title/'SETUP.md')
+    shutil.copy2(ROOT/'INSTALL.md',title/'INSTALL.md')
     assert json.loads((title/'sce_sys/param.json').read_text())['titleId']==TITLE
     paths=sorted(p for p in title.rglob('*') if p.is_file())
     assert not any(p.suffix.lower() in {'.rpx','.key','.wwhd','.wux','.wud','.gcm'} for p in paths)

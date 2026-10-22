@@ -1,3 +1,8 @@
+CURRENT INSTALLATION GUIDE: https://github.com/mshivam019/ww-ps5/blob/main/INSTALL.md
+Use that guide for internal/USB storage, offline copying or Wi-Fi FTP.
+M.2, Ethernet and PS5 Upload are optional. Paths in older instructions below
+describe the developer setup, not required hardware or transfer software.
+
 # Setup and installation
 
 Install the release's **PPSA99641.zip** app first. The computer setup prepares its

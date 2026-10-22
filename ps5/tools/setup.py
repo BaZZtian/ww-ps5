@@ -152,7 +152,7 @@ def main():
         module=work/'game.wwhd'
         run(python,ROOT/'ps5/tools/build-game-module.py','--archive',archive,'--clang',tools['clang'],'--linker',tools['ld.lld'],'--nm',tools['llvm-nm'],'--output',module)
         run(python,ROOT/'ps5/tools/package-game.py','--game',game,'--module',module,'--output',a.output)
-        print('Copy the generated game/ and user/ folders into the matching installed PPSA99641 app.')
+        print('Preparation finished. Copy game/ into the matching installed PPSA99641 folder using any method. Preserve existing user/ saves/settings; see INSTALL.md for optional mods and transfer.')
         return
     elf=work/'llvm-pie.elf'
     recipe=json.loads((runtime/'link.json').read_text())
