@@ -1,5 +1,11 @@
 # Wind Waker HD for PS5
 
+## Start here
+
+Use the installation guide for Wind Waker HD and your own supported Wii U game data. Store and manual installations have separate setup steps.
+
+[Original project releases](https://github.com/mshivam019/ww-ps5/releases)
+
 **Installed from ProsperoStore?** [Use the game-specific setup](INSTALL.md#already-installed-from-prosperostore): choose your game files and an output location; it prepares and checks a ready-to-copy folder automatically. Download **PS5-Install-Helper-v1.2.0.zip** from this game's release. Python 3.9+ is required; game conversion/module preparation requirements are listed in the guide.
 
 **[Start here: installation, USB/offline copying, Wi-Fi FTP and game-file locations](INSTALL.md).**
@@ -77,12 +83,6 @@ See [mod setup and paths](ps5/README.md#mods) for details.
 
 This changes the emulated Wii U language, not your PS5 system language. The settings menu stays in English. PlayStation button textures currently cover English only; French and Spanish use the original prompts.
 
-## Build and validate
-
-See [build instructions](ps5/README.md#windows-macos-and-linux), [dependency pins](ps5/dependencies.json) and [release validation](ps5/RELEASING.md). The build creates a private installation from your dump; keep that generated package local.
-
-The default is paced 60 FPS interpolation. Frame rate varies by scene; True 60 remains an optional setting.
-
 ## Credits and license
 
 - [ZeldaWWHDRecomp](https://github.com/ZeldaWWHDRecomp) and its [contributors](https://github.com/ZeldaWWHDRecomp/ZeldaWWHDRecomp): the original recompilation, runtime and mod manager.
@@ -96,3 +96,5 @@ The default is paced 60 FPS interpolation. Frame rate varies by scene; True 60 r
 The project retains upstream’s [MPL-2.0 license](LICENSE). See [third-party notices](ps5/THIRD_PARTY_NOTICES.md) for the bundled libraries and tools. The linked PS5 platform uses GPL-3.0-or-later; dependencies retain their own licenses and notices.
 
 Not affiliated with Nintendo or Sony Interactive Entertainment. PlayStation and PS5 are Sony trademarks. Vulkan is a Khronos Group trademark; the PS5 RADV port is not a conformant product.
+
+[Build and developer documentation](BUILDING.md)
